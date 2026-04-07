@@ -3,12 +3,8 @@ import requests
 import pandas as pd
 from datetime import datetime
 
-# -----------------------------------------------------------------------------
-# 1. API Configuration & Helper Functions
-# -----------------------------------------------------------------------------
 LEETCODE_GRAPHQL_URL = 'https://leetcode.com/graphql'
 
-# Adding a standard User-Agent to prevent getting blocked by basic bot-protections
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)",
     "Content-Type": "application/json"
@@ -18,7 +14,6 @@ def extract_username(text):
     """Extracts the username whether the user pastes a full URL or just the name."""
     text = text.strip()
     if text.startswith("http"):
-        # e.g., https://leetcode.com/username/ -> username
         parts = [p for p in text.rstrip('/').split('/') if p]
         return parts[-1]
     return text
@@ -92,15 +87,11 @@ def fetch_question_difficulty(title_slug):
             return data['data']['question']['difficulty']
     return "Unknown"
 
-# -----------------------------------------------------------------------------
-# 2. Streamlit Web Interface
-# -----------------------------------------------------------------------------
 st.set_page_config(page_title="LeetCode Profile Tracker", page_icon="", layout="wide")
 
 st.title("LeetCode Stats & Submissions Tracker")
 st.markdown("Extract a user's total statistics and filter their most recent accepted questions based on timeline and hardness.")
 
-# Input Section
 st.markdown("### Search Profile")
 username_input = st.text_input("Enter LeetCode Username or Profile URL:", placeholder="e.g., neetcode or https://leetcode.com/neetcode/")
 
@@ -116,7 +107,6 @@ if st.button("Fetch Data", type="primary"):
             if not stats:
                 st.error(f"Could not find data for user '{username}'. Make sure the profile exists and is public.")
             else:
-                # Calculate metric distributions
                 easy, med, hard, total = 0, 0, 0, 0
                 for item in stats:
                     if item['difficulty'] == "All": total = item['count']
@@ -126,7 +116,6 @@ if st.button("Fetch Data", type="primary"):
                 
                 st.success(f"Profile loaded successfully!")
                 
-                # Display Total Metrics
                 st.markdown("---")
                 st.markdown(f"### Lifetime Stats for `{username}`")
                 cols = st.columns(4)
@@ -135,7 +124,6 @@ if st.button("Fetch Data", type="primary"):
                 cols[2].metric(label="Medium", value=med)
                 cols[3].metric(label="Hard", value=hard)
                 
-                # Fetch Recent Submissions
                 st.markdown("---")
                 st.markdown("### Recent Submissions Activity")
                 
@@ -162,21 +150,15 @@ if st.button("Fetch Data", type="primary"):
                         
                         my_bar.progress((idx + 1) / len(submissions), text=progress_text)
                         
-                    my_bar.empty() # Remove progress bar when done
-                    
-                    # Store data in session state so it persists during filtering
+                    my_bar.empty() 
                     st.session_state['df'] = pd.DataFrame(data_rows)
                     st.session_state['username'] = username
 
-# -----------------------------------------------------------------------------
-# 3. Filtering and Table Display (Renders if Data is in Session)
-# -----------------------------------------------------------------------------
 if 'df' in st.session_state:
     df = st.session_state['df']
     
     st.markdown("#### Filter Results")
     
-    # Layout for Filters
     f_cols = st.columns(2)
     with f_cols[0]:
         min_date = df['Date'].min()
@@ -187,7 +169,6 @@ if 'df' in st.session_state:
         difficulties = ["All", "Easy", "Medium", "Hard"]
         selected_diff = st.selectbox("Filter by Difficulty", difficulties)
     
-    # Apply Filters
     filtered_df = df.copy()
     
     if len(selected_dates) == 2:
@@ -202,7 +183,6 @@ if 'df' in st.session_state:
         
     st.markdown(f"**Showing {len(filtered_df)} result(s)**")
     
-    # Display an interactive dataframe
     st.dataframe(
         filtered_df,
         column_config={
