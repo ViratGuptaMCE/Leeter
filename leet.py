@@ -144,7 +144,6 @@ if st.button("Fetch Data", type="primary"):
                             "Question": sub['title'],
                             "Difficulty": diff,
                             "Date": dt_obj.date(),
-                            "Time": dt_obj.strftime('%H:%M:%S'),
                             "Link": f"https://leetcode.com/problems/{sub['titleSlug']}/"
                         })
                         
@@ -194,3 +193,14 @@ if 'df' in st.session_state:
         use_container_width=True,
         hide_index=True
     )
+
+st.markdown(
+    """
+    <hr style="margin-top:50px; margin-bottom:10px;">
+    <div style="text-align:center; color:grey; font-size:14px;">
+        Made with ❤️· 
+        <a href="https://github.com/ViratGuptaMCE/Leeter" target="_blank">View Source on GitHub</a>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
